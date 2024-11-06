@@ -1,36 +1,69 @@
 using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
+var otel = builder.Services.AddOpenTelemetry();
+
+// Configure OpenTelemetry Resources with the application name
+otel.ConfigureResource(resource => resource
+    .AddService(serviceName: builder.Environment.ApplicationName));
+
+// Add Metrics for ASP.NET Core and our custom metrics and export to Prometheus
+otel.WithMetrics(metrics => metrics
+    // Metrics provider from OpenTelemetry
+    .AddAspNetCoreInstrumentation()
+    // Metrics provides by ASP.NET Core in .NET 8
+    .AddMeter("Microsoft.AspNetCore.Hosting")
+    .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+    .AddMeter("System.Http")
+    .AddMeter("Roaster.Api.Roasts")
+    .AddPrometheusExporter());
+
+// Add Tracing for ASP.NET Core and our custom ActivitySource and export to Jaeger
+otel.WithTracing(tracing =>
+{
+    tracing.AddAspNetCoreInstrumentation();
+    tracing.AddHttpClientInstrumentation();
+    if (tracingOtlpEndpoint != null)
+    {
+        tracing.AddOtlpExporter(otlpOptions =>
+         {
+             otlpOptions.Endpoint = new Uri(tracingOtlpEndpoint);
+         });
+    }
+});
+
 builder.Logging.AddOpenTelemetry(log =>
 {
     log.IncludeScopes = true;
     log.IncludeFormattedMessage = true;
 });
-builder.Services
-    .AddOpenTelemetry()
-    .WithMetrics(x => {
-       x.AddRuntimeInstrumentation();
-       x
-        .AddMeter("Microsoft.AspNetCore.Hosting")
-        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-        .AddMeter("System.Http")
-        .AddMeter("Roaster.Api.Roasts")
-        .AddPrometheusExporter();
-    })
-    .WithTracing(x =>
-    {
-        if(builder.Environment.IsDevelopment())
-        {
-            x.SetSampler<AlwaysOnSampler>();
-        }
+//builder.Services
+//    .AddOpenTelemetry()
+//    .WithMetrics(x => {
+//       x.AddRuntimeInstrumentation();
+//       x
+//        .AddMeter("Microsoft.AspNetCore.Hosting")
+//        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+//        .AddMeter("System.Http")
+//        .AddMeter("Roaster.Api.Roasts")
+//        .AddPrometheusExporter();
+//    })
+//    .WithTracing(x =>
+//    {
+//        if(builder.Environment.IsDevelopment())
+//        {
+//            x.SetSampler<AlwaysOnSampler>();
+//        }
 
-        x.AddAspNetCoreInstrumentation();
-        x.AddHttpClientInstrumentation();
-    });
+//        x.AddAspNetCoreInstrumentation();
+//        x.AddHttpClientInstrumentation();
+//    });
 
 
 var app = builder.Build();

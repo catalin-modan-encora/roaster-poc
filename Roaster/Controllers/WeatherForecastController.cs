@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Metrics;
 
 namespace Roaster.Controllers
 {
@@ -12,15 +13,18 @@ namespace Roaster.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly Counter<int> _hits;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IMeterFactory meterFactory)
         {
             _logger = logger;
+            _hits = meterFactory.Create("Roaster.Api.Roasts").CreateCounter<int>("Roaster.GetWeatherForecast.Hits");
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            _hits.Add(1);
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
