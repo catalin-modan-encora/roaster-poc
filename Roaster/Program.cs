@@ -43,28 +43,6 @@ builder.Logging.AddOpenTelemetry(log =>
     log.IncludeScopes = true;
     log.IncludeFormattedMessage = true;
 });
-//builder.Services
-//    .AddOpenTelemetry()
-//    .WithMetrics(x => {
-//       x.AddRuntimeInstrumentation();
-//       x
-//        .AddMeter("Microsoft.AspNetCore.Hosting")
-//        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-//        .AddMeter("System.Http")
-//        .AddMeter("Roaster.Api.Roasts")
-//        .AddPrometheusExporter();
-//    })
-//    .WithTracing(x =>
-//    {
-//        if(builder.Environment.IsDevelopment())
-//        {
-//            x.SetSampler<AlwaysOnSampler>();
-//        }
-
-//        x.AddAspNetCoreInstrumentation();
-//        x.AddHttpClientInstrumentation();
-//    });
-
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
