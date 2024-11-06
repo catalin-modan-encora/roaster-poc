@@ -11,6 +11,7 @@ services:
   roaster:
     depends_on:
         - prometheus
+        - zipkin
     build:
       context: .
       dockerfile: Roaster/Dockerfile
@@ -20,8 +21,9 @@ services:
       - monitoring
     ports:
       - 880:8080
-    # environment:
-      # - OTLP_ENDPOINT_URL=value
+    environment:
+      # - OTLP_ENDPOINT_URL=
+      - ZIPKIN_URL=http://zipkin:9411/api/v2/spans
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -38,5 +40,14 @@ services:
       - "--web.enable-lifecycle"
     ports:
       - 9090:9090
+    networks:
+      - monitoring
+
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: zipkin
+    restart: unless-stopped
+    ports:
+      - 9411:9411    
     networks:
       - monitoring

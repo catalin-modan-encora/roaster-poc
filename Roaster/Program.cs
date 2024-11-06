@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
+var zipkinUrl = builder.Configuration["ZIPKIN_URL"];
 var otel = builder.Services.AddOpenTelemetry();
 
 // Configure OpenTelemetry Resources with the application name
@@ -22,14 +23,24 @@ otel.WithMetrics(metrics => metrics
     .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
     .AddMeter("System.Http")
     .AddMeter("Roaster.Api.Roasts")
-    .AddPrometheusExporter());
+    .AddPrometheusExporter()
+);
 
 // Add Tracing for ASP.NET Core and our custom ActivitySource and export to Jaeger
 otel.WithTracing(tracing =>
 {
     tracing.AddAspNetCoreInstrumentation();
     tracing.AddHttpClientInstrumentation();
-    if (tracingOtlpEndpoint != null)
+
+    if (zipkinUrl is not null)
+    {
+        tracing.AddZipkinExporter(b =>
+        {
+            b.Endpoint = new Uri(zipkinUrl);
+        });
+    }
+
+    if (tracingOtlpEndpoint is not null)
     {
         tracing.AddOtlpExporter(otlpOptions =>
          {
