@@ -30,6 +30,29 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
 
+  docker:
+    runs-on: ubuntu-24.04
+    env:
+      DOCKERFILE: "./Roaster/Dockerfile"
+      CONTEXT: "."
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.CONTEXT }}
+          file: ${{ env.DOCKERFILE }}
+          push: false
+          labels: ${{ github.sha }}
+          platforms: linux/amd64
+
   run-unit-tests:
     runs-on: ubuntu-24.04
     env:
@@ -43,6 +66,7 @@ jobs:
       TEST_COVERAGE_DIR: "./coverage"
     needs:
       - build
+      - docker
     steps:
       - uses: actions/checkout@v4
 
@@ -73,6 +97,7 @@ jobs:
       TEST_COVERAGE_DIR: "./coverage"
     needs:
       - build
+      - docker
     steps:
       - uses: actions/checkout@v4
 
