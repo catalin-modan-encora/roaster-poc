@@ -5,27 +5,57 @@ name: .NET CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
     runs-on: ubuntu-24.04
-
+    env:
+      DOTNET_VERSION: 8.0.205
+      SOLUTION_PATH: "./Roaster.sln"
+      DOTNET_CONFIGURATION: "Release"
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET ${{ vars.DOTNET_VERSION }}
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ vars.DOTNET_VERSION }}
-        
-    - name: Restore dependencies
-      run: dotnet restore ${{ vars.SOLUTION_PATH }}
-      
-    - name: Build
-      run: dotnet build ${{ vars.SOLUTION_PATH }} --configuration ${{ vars.DOTNET_CONFIGURATION }} --no-restore
+      - uses: actions/checkout@v4
 
-   #  - name: Test
-   #    run: dotnet test ${{ vars.SOLUTION_PATH }} --configuration ${{ vars.DOTNET_CONFIGURATION }} --no-build --verbosity normal
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
+
+  run-unit-tests:
+    runs-on: ubuntu-24.04
+    env:
+      DOTNET_VERSION: 8.0.205
+      SOLUTION_PATH: "./Roaster.sln"
+      DOTNET_CONFIGURATION: "Release"
+      TEST_VERBOSITY: "normal"
+      TEST_PROJECT: "Roaster.UnitTests/Roaster.UnitTests.csproj"
+      TEST_COVERAGE_FORMAT: "xml"
+      TEST_COVERAGE_FILE: "coverage.xml"
+      TEST_COVERAGE_DIR: "./coverage"
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build --verbosity ${{ env.TEST_VERBOSITY }} --collect:"Code Coverage;Format=${{ env.TEST_COVERAGE_FORMAT }};CoverageFileName=${{ env.TEST_COVERAGE_FILE }}" --results-directory ${{ env.TEST_COVERAGE_DIR }}
