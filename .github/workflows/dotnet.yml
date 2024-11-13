@@ -65,8 +65,8 @@ jobs:
       TEST_COVERAGE_FILE: "coverage.xml"
       TEST_COVERAGE_DIR: "./coverage"
     needs:
-      - build
-      - docker
+      - linux-build
+      - docker-build
     steps:
       - uses: actions/checkout@v4
 
