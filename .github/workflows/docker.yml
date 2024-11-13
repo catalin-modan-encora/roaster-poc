@@ -31,7 +31,7 @@ jobs:
       - name: Login
         uses: docker/login-action@v3
         with:
-          registry: ${{ vars.ACR_URL }}
+          # registry: ${{ vars.ACR_URL }}
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
@@ -41,5 +41,5 @@ jobs:
           context: ${{ env.CONTEXT }}
           file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ${{ vars.ACR_URL }}/${{ vars.REPOSITORY }}:${{ env.REF }}
+          tags: ${{ vars.REPOSITORY }}:${{ env.REF }}
           labels: ${{ github.sha }}
