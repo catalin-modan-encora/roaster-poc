@@ -14,6 +14,7 @@ jobs:
     env:
       DOCKERFILE: "./Roaster/Dockerfile"
       CONTEXT: "."
+      REF: ${{ github.head_ref || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,5 +41,5 @@ jobs:
           context: ${{ env.CONTEXT }}
           file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ${{ vars.REPOSITORY }}:${{ github.head_ref }}
+          tags: ${{ vars.REPOSITORY }}:${{ env.REF }}
           labels: ${{ github.sha }}
