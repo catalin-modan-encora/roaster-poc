@@ -115,7 +115,7 @@ jobs:
       - name: Test
         run: dotnet test ${{ env.TEST_PROJECT }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build --verbosity ${{ env.TEST_VERBOSITY }} --collect:"Code Coverage;Format=${{ env.TEST_COVERAGE_FORMAT }};CoverageFileName=${{ env.TEST_COVERAGE_FILE }}" --results-directory ${{ env.TEST_COVERAGE_DIR }}
 
-  roslin-analysis:
+  roslyn-analysis:
     runs-on: ubuntu-24.04
     needs:
       - linux-build
