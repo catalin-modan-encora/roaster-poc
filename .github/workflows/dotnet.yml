@@ -59,3 +59,33 @@ jobs:
 
       - name: Test
         run: dotnet test ${{ env.TEST_PROJECT }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build --verbosity ${{ env.TEST_VERBOSITY }} --collect:"Code Coverage;Format=${{ env.TEST_COVERAGE_FORMAT }};CoverageFileName=${{ env.TEST_COVERAGE_FILE }}" --results-directory ${{ env.TEST_COVERAGE_DIR }}
+
+  run-integration-tests:
+    runs-on: ubuntu-24.04
+    env:
+      DOTNET_VERSION: 8.0.205
+      SOLUTION_PATH: "./Roaster.sln"
+      DOTNET_CONFIGURATION: "Release"
+      TEST_VERBOSITY: "normal"
+      TEST_PROJECT: "Roaster.IntegrationTests/Roaster.IntegrationTests.csproj"
+      TEST_COVERAGE_FORMAT: "xml"
+      TEST_COVERAGE_FILE: "coverage.xml"
+      TEST_COVERAGE_DIR: "./coverage"
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
+
+      - name: Test
+        run: dotnet test ${{ env.TEST_PROJECT }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build --verbosity ${{ env.TEST_VERBOSITY }} --collect:"Code Coverage;Format=${{ env.TEST_COVERAGE_FORMAT }};CoverageFileName=${{ env.TEST_COVERAGE_FILE }}" --results-directory ${{ env.TEST_COVERAGE_DIR }}
