@@ -40,5 +40,5 @@ jobs:
           context: ${{ env.CONTEXT }}
           file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ${{ vars.REPOSITORY }}:${{ env.GITHUB_REF_NAME }}
+          tags: ${{ vars.REPOSITORY }}:${{ github.head_ref }}
           labels: ${{ github.sha }}
