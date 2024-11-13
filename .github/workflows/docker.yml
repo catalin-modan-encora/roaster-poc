@@ -31,6 +31,7 @@ jobs:
       - name: Login
         uses: docker/login-action@v3
         with:
+          # required if using 3rd party registries, such as ACR
           # registry: ${{ vars.ACR_URL }}
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -43,3 +44,4 @@ jobs:
           push: true
           tags: ${{ vars.REPOSITORY }}:${{ env.REF }}
           labels: ${{ github.sha }}
+          platforms: linux/amd64
