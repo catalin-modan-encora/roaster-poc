@@ -10,7 +10,7 @@ on:
     branches: ["master"]
 
 jobs:
-  build:
+  linux-build:
     runs-on: ubuntu-24.04
     env:
       DOTNET_VERSION: 8.0.205
@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
 
-  docker:
+  docker-build:
     runs-on: ubuntu-24.04
     env:
       DOCKERFILE: "./Roaster/Dockerfile"
@@ -96,8 +96,8 @@ jobs:
       TEST_COVERAGE_FILE: "coverage.xml"
       TEST_COVERAGE_DIR: "./coverage"
     needs:
-      - build
-      - docker
+      - linux-build
+      - docker-build
     steps:
       - uses: actions/checkout@v4
 
