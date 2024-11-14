@@ -3,7 +3,7 @@ name: Docker Image CI
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 permissions:
   contents: read
@@ -31,8 +31,7 @@ jobs:
       - name: Login
         uses: docker/login-action@v3
         with:
-          # required if using 3rd party registries, such as ACR
-          # registry: ${{ vars.ACR_URL }}
+          registry: ${{ vars.ACR_URL }}
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
