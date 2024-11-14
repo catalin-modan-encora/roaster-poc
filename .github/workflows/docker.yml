@@ -41,6 +41,6 @@ jobs:
           context: ${{ env.CONTEXT }}
           file: ${{ env.DOCKERFILE }}
           push: true
-          tags: ${{ vars.REPOSITORY }}:${{ env.REF }}
+          tags: ${{ vars.ACR_URL }}/${{ vars.REPOSITORY }}:${{ env.REF }}
           labels: ${{ github.sha }}
           platforms: linux/amd64
