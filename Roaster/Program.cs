@@ -1,3 +1,4 @@
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -8,7 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
 var zipkinUrl = builder.Configuration["ZIPKIN_URL"];
-var otel = builder.Services.AddOpenTelemetry();
+var otel = builder.Services.AddOpenTelemetry().UseAzureMonitor();
 
 // Configure OpenTelemetry Resources with the application name
 otel.ConfigureResource(resource => resource
@@ -56,7 +57,7 @@ builder.Logging.AddOpenTelemetry(log =>
 });
 
 // The following line enables Application Insights telemetry collection.
-builder.Services.AddApplicationInsightsTelemetry();
+//builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
