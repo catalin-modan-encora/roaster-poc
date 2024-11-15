@@ -2,8 +2,8 @@
 
 ## Docker
 ### Application
-- http://localhost:880/WeatherForecast
-- http://localhost:880/metrics
+- http://localhost:8080/WeatherForecast
+- http://localhost:8080/metrics
 ### Prometheus
 - http://localhost:9090
 ### Zipkin
@@ -25,3 +25,13 @@ dotnet ef migrations add Roaster_CreateRoast --context ApplicationDbContext --st
 git tag -a 1.1.14 -m "release-1.1.14"
 git push --follow-tags
 ```
+
+# Database authentication using MANID
+1. Execute the scripts below on your database (not on master):
+```
+CREATE USER "mi-webapp-roaster-northeu" FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER "mi-webapp-roaster-northeu";
+ALTER ROLE db_dataWRITER ADD MEMBER "mi-webapp-roaster-northeu";
+ALTER ROLE db_owner ADD MEMBER [mi-webapp-roaster-northeu]
+```
+2. Assign the managed identity to the web application.
