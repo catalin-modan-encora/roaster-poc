@@ -1,7 +1,12 @@
 using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Roaster.Infrastructure.Persistence;
+
+// dotnet ef migrations add Roaster_CreateRoast --context ApplicationDbContext --startup-project Roaster.csproj --project Roaster.csproj -o Infrastructure/Persistence/Migrations
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
@@ -9,7 +14,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 var tracingOtlpEndpoint = builder.Configuration["OTLP_ENDPOINT_URL"];
 var zipkinUrl = builder.Configuration["ZIPKIN_URL"];
-var otel = builder.Services.AddOpenTelemetry().UseAzureMonitor();
+var otel = builder.Services.AddOpenTelemetry();
+
+if (!builder.Environment.IsDevelopment())
+{
+    otel.UseAzureMonitor();
+}
 
 // Configure OpenTelemetry Resources with the application name
 otel.ConfigureResource(resource => resource
@@ -56,8 +66,15 @@ builder.Logging.AddOpenTelemetry(log =>
     log.IncludeFormattedMessage = true;
 });
 
-// The following line enables Application Insights telemetry collection.
-//builder.Services.AddApplicationInsightsTelemetry();
+builder.Services.AddDbContext<ApplicationDbContext>(db =>
+{
+    db.UseSqlServer(builder.Configuration.GetConnectionString("RoastDb"), options =>
+    {
+        options.MigrationsAssembly(typeof(ApplicationDbContext).Assembly);
+    });
+});
+
+builder.Services.AddDataProtection().PersistKeysToDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -65,9 +82,31 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.MapPrometheusScrapingEndpoint();
-app.Run();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        context.Database.EnsureCreated();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception exception)
+    {
+        logger.LogCritical(exception, "Unable to migrate the database.");
+        throw;
+    }
+}
+await app.RunAsync();

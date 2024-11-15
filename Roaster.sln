@@ -12,9 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roaster.UnitTests", "Roaster.UnitTests\Roaster.UnitTests.csproj", "{7FA75C6F-F307-4946-AB07-FD12A1F62E5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaster.UnitTests", "Roaster.UnitTests\Roaster.UnitTests.csproj", "{7FA75C6F-F307-4946-AB07-FD12A1F62E5F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Roaster.IntegrationTests", "Roaster.IntegrationTests\Roaster.IntegrationTests.csproj", "{4BDE73E2-42B5-41BA-A77E-BFE753F65436}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Roaster.IntegrationTests", "Roaster.IntegrationTests\Roaster.IntegrationTests.csproj", "{4BDE73E2-42B5-41BA-A77E-BFE753F65436}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
