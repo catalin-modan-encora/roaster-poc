@@ -27,11 +27,18 @@ git push --follow-tags
 ```
 
 # Database authentication using MANID
-1. Execute the scripts below on your database (not on master):
+1. Execute the scripts below on your database (not on masterm without <>). This effective registers the managed identity as a user in the database server.
 ```
-CREATE USER "mi-webapp-roaster-northeu" FROM EXTERNAL PROVIDER;
-ALTER ROLE db_datareader ADD MEMBER "mi-webapp-roaster-northeu";
-ALTER ROLE db_dataWRITER ADD MEMBER "mi-webapp-roaster-northeu";
-ALTER ROLE db_owner ADD MEMBER [mi-webapp-roaster-northeu]
+CREATE USER "<MANID name>" FROM EXTERNAL PROVIDER;
+ALTER ROLE db_datareader ADD MEMBER "<MANID name>";
+ALTER ROLE db_dataWRITER ADD MEMBER "<MANID name>";
+ALTER ROLE db_owner ADD MEMBER [<MANID name>]
 ```
 2. Assign the managed identity to the web application.
+3. Create the connection string:
+```
+Server=<server address>,1433;Initial Catalog=<database>;Persist Security Info=False;User ID=<MANID Client ID>;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Authentication="Active Directory Managed Identity";
+```
+4. Make sure that private network access is enable for the VNET/Subvnet of the web app, on the SQL server.
+5. vertify that the VNET has the `Microsoft.Sql` service endpoint enabled.
+6. Set the environment variable in the web app, having the name `ConnectionStrings__RoastDb` and set its value to the connection string from point (3).
