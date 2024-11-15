@@ -21,5 +21,4 @@ app.MapControllers();
 app
     .UseCustomTelemetry()
     .UseOpenApi();
-await app.MigrateDatabaseAsync();
 await app.RunAsync();
