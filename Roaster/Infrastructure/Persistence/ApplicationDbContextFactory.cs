@@ -9,7 +9,8 @@ namespace Roaster.Infrastructure.Persistence
         {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile("appsettings.Development.json", true)
                 .Build();
 
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
