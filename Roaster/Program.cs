@@ -4,8 +4,6 @@ using Roaster.Infrastructure.Persistence.Extensions;
 using Roaster.Infrastructure.Protection.Extensions;
 using Roaster.Infrastructure.Telemetry.Extensions;
 
-// dotnet ef migrations add Roaster_CreateRoast --context ApplicationDbContext --startup-project Roaster.csproj --project Roaster.csproj -o Infrastructure/Persistence/Migrations
-
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddCustomOpenApi();
