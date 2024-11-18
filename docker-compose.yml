@@ -20,7 +20,7 @@ services:
     networks:
       - monitoring
     ports:
-      - 880:8080
+      - 8080:80
     environment:
       # - OTLP_ENDPOINT_URL=
       - ZIPKIN_URL=http://zipkin:9411/api/v2/spans

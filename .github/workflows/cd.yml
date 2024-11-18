@@ -20,21 +20,55 @@ jobs:
     environment: "${{ github.event.inputs.environment }}"
     permissions:
       contents: none
-    runs-on: ubuntu-24.04
+    runs-on:
+      labels: roaster
     env:
       IMAGE: "${{ vars.ACR_URL }}/${{ vars.REPOSITORY }}:${{ github.event.inputs.version }}"
+      SCRIPTS_OUTPUT_DIR: "./scripts"
+      SCRIPTS_FILE_NAME: "migrations.sql"
+      STARTUP_PROJECT: "./Roaster/Roaster.csproj"
+      DOTNET_VERSION: 8.0.205
+      DOTNET_INSTALL_DIR: "~/tools/dotnet"
+      DOTNET_CONFIGURATION: "Release"
+      SOLUTION_PATH: "./Roaster.sln"
     steps:
       - name: Validate version
         run: |
           echo "Validating that tag is a production deploy tag (must be in the format [0-9]+.[0-9]+.[0-9]+, ex. 1.2.3)"
           echo "${{ github.event.inputs.version }}" | grep -P '[0-9]+.[0-9]+.[0-9]+'
 
-      - name: Login
-        uses: docker/login-action@v3
+      - uses: actions/checkout@v4
+
+      # TODO: migrations bundler generation should be done in CI
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
         with:
-          registry: ${{ vars.ACR_URL }}
-          username: ${{ secrets.AZURE_CLIENT_ID }}
-          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Verify dotnet ef
+        run: dotnet ef --version
+
+      - name: Generate standalone scripts
+        run: dotnet ef migrations script --idempotent --output ${{ env.SCRIPTS_OUTPUT_DIR }}/${{ env.SCRIPTS_FILE_NAME }} --startup-project ${{ env.STARTUP_PROJECT }}
+
+      - name: Generate migrations bundle
+        run: dotnet ef migrations bundle --self-contained -r linux-x64 --force --startup-project ${{ env.STARTUP_PROJECT }}
+
+      - name: Make bundle executable
+        run: chmod +x ./efbundle
+
+      # do not use double quotes " in the connection string, replace them with single quotes '
+      - name: Apply migrations to database
+        run: ./efbundle --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
