@@ -44,11 +44,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Install dotnet EF
-        run: |
-          dotnet tool install --global dotnet-ef --version 8.*
-          dotnet tool restore
-
       - name: Restore dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
 
@@ -65,6 +60,12 @@ jobs:
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
+      - name: Apply migrations to database
+        run: |
+          dotnet tool install --global dotnet-ef --version 8.*
+          dotnet tool restore
+          dotnet ef database update --connection ${{ secrets.DATABASE_CONNECTION_STRING }}
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
@@ -72,6 +73,3 @@ jobs:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: "${{ env.IMAGE }}"
-
-      - name: Apply migrations to database
-        run: dotnet ef database update --connection ${{ secrets.DATABASE_CONNECTION_STRING }}
