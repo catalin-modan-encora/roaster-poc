@@ -50,16 +50,6 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.SOLUTION_PATH }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
 
-      - name: Generate standalone scripts
-        run: dotnet ef migrations script --idempotent --output ${{ env.SCRIPTS_OUTPUT_DIR }}/${{ env.SCRIPTS_FILE_NAME }} --startup-project ${{ env.STARTUP_PROJECT }}
-
-      - name: Login
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ vars.ACR_URL }}
-          username: ${{ secrets.AZURE_CLIENT_ID }}
-          password: ${{ secrets.AZURE_CLIENT_SECRET }}
-
       - name: Restore tools
         run: dotnet tool restore
 
@@ -76,3 +66,10 @@ jobs:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: "${{ env.IMAGE }}"
+
+      - name: Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_URL }}
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
