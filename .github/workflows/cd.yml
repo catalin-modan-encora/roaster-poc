@@ -60,11 +60,14 @@ jobs:
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Verify dotnet ef
+        run: dotnet ef --version
+
       - name: Apply migrations to database
-        run: |
-          dotnet tool install --global dotnet-ef --version 8.*
-          dotnet tool restore
-          dotnet ef database update --connection ${{ secrets.DATABASE_CONNECTION_STRING }}
+        run: dotnet ef database update --connection ${{ secrets.DATABASE_CONNECTION_STRING }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
