@@ -27,6 +27,7 @@ jobs:
       SCRIPTS_OUTPUT_DIR: "./scripts"
       SCRIPTS_FILE_NAME: "migrations.sql"
       STARTUP_PROJECT: "./Roaster/Roaster.csproj"
+      DOTNET_VERSION: 8.0.205
     steps:
       - name: Validate version
         run: |
