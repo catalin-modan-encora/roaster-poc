@@ -10,7 +10,7 @@ namespace Roaster.Infrastructure.Persistence.Extensions
             {
                 db.UseSqlServer(configuration.GetConnectionString("RoastDb"), options =>
                 {
-                    options.MigrationsAssembly(typeof(ApplicationDbContext).Assembly);
+                    options.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.ToString());
                 });
             });
 
