@@ -49,7 +49,7 @@ namespace Roaster.Controllers
         {
             var roasts = await _context.Roasts.ToListAsync(cancellationToken);
 
-            return !roasts.Any() ? NoContent() : Ok(new GetAllRoastsResponse(roasts.Select(r => new SingleRoast(ProtectId(r.Id), r.Name))));
+            return roasts.Count == 0 ? NoContent() : Ok(new GetAllRoastsResponse(roasts.Select(r => new SingleRoast(ProtectId(r.Id), r.Name))));
         }
     }
 }
