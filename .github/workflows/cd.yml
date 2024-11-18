@@ -66,9 +66,7 @@ jobs:
         run: chmod +x ./efbundle
 
       - name: Apply migrations to database
-        run: |
-          chmod +x ./efbundle 
-          ./efbundle --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
+        run: ./efbundle --connection "${{ secrets.DATABASE_CONNECTION_STRING }}"
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
