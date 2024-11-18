@@ -43,7 +43,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Install dotnet EF
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 8.*
 
       - name: Generate standalone scripts
         run: dotnet ef migrations script --idempotent --output ${{ env.SCRIPTS_OUTPUT_DIR }}/${{ env.SCRIPTS_FILE_NAME }} --startup-project ${{ env.STARTUP_PROJECT }}
