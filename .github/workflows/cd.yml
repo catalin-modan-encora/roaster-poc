@@ -62,6 +62,9 @@ jobs:
       - name: Generate migrations bundle
         run: dotnet ef migrations bundle --self-contained -r linux-x64 --force --startup-project ${{ env.STARTUP_PROJECT }}
 
+      - name: Make bundle executable
+        run: chmod +x ./efbundle
+
       - name: Apply migrations to database
         run: |
           chmod +x ./efbundle 
