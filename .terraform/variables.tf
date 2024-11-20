@@ -1,3 +1,12 @@
+locals {
+  # Tags which need to be applied to all resources
+  tags = {
+    ProjectName = "Roaster"
+    Environment = "Roaster-DEV"
+    Owner       = var.owner
+  }
+}
+
 variable "subscription_id" {
   description = "The subscription ID for the deployment."
   type        = string
@@ -5,6 +14,11 @@ variable "subscription_id" {
 
 variable "tenant_id" {
   description = "The tenant ID where the subscription lives."
+  type        = string
+}
+
+variable "owner" {
+  description = "The owner of the environment"
   type        = string
 }
 

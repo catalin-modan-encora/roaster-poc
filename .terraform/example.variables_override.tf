@@ -6,3 +6,7 @@ variable "subscription_id" {
 variable "tenant_id" {
   default = "<YOUR TENANT ID>"
 }
+
+variable "owner" {
+  default = "<THE NAME OF THE DEVELOPER>"
+}
