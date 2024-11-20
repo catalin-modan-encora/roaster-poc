@@ -7,6 +7,12 @@
 4. VS-Code installed locally.
 5. GIT installed locally.
 
+## Authentication
+1. Login using Azure CLI as the user: `az logout && az login`.
+2. Login using a Service Principal which has `Contributor` level access over the subscription: `az logout && az login --service-principal -u "<CLIENT ID>" -p "<Secret>" --tenant "<TENANT ID>"`
+
+Official documentation for authentication: `https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/azure_cli`
+
 ## Setup
 1. Create your variables overrides for local development.
    1. Copy `example.variables_override.tf` into `variables_override.tf`.
