@@ -10,3 +10,7 @@ variable "tenant_id" {
 variable "owner" {
   default = "<THE NAME OF THE DEVELOPER>"
 }
+
+variable "region" {
+  default = "<YOUR DESIRED REGION>"
+}
