@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Terraform
 .terraform/.terraform/**
+.terraform/variables_override.tf
